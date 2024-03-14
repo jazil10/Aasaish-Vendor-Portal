@@ -1,0 +1,24 @@
+.products-container {
+    padding: 20px;
+  }
+  
+  .product-form {
+    margin-bottom: 20px;
+  }
+  
+  .product-form input, .product-form textarea {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .product-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .product-item img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  

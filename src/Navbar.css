@@ -1,0 +1,39 @@
+.navbar {
+    width: 100%; /* Ensure navbar takes full width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    background-color: #5e4b8b; /* Your desired background color */
+    padding: 10px 20px; /* Adjust padding as needed */
+    margin: 0 auto; /* Remove any margin that might affect the width */
+    display: flex; /* Use flexbox to align items */
+    justify-content: flex-end; /* Align nav items to the right */
+  }
+  
+  .nav-items {
+    display: flex;
+    justify-content: flex-end; /* Align items to the right */
+    align-items: center;
+    gap: 20px;
+    width: 100%; /* Ensure nav items container takes full width */
+    padding: 0; /* Remove padding if any */
+    margin: 0; /* Ensure no margin affects the width */
+  }
+  
+  .nav-link, .logout-button {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .logout-button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #4e3a76; /* A slightly darker purple for contrast */
+  }
+  
+  .logout-button:hover {
+    background-color: #3d2f5b;
+  }
+  

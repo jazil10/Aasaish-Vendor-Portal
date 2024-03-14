@@ -1,0 +1,44 @@
+.login-page {
+  display: flex;
+  height: 100vh;
+}
+
+.left-panel, .right-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.icon {
+  margin-bottom: 20px;
+}
+
+.login-form h2 {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.login-input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+/* Add more styles based on your preference to make it look better */

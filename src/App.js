@@ -5,6 +5,8 @@ import ProductsPage from './ProductsPage';
 import StoresPage from './StoresPage';
 import LoginPage from './LoginPage';
 import InventoryPage from './InventoryPage';
+import TagsPage from './TagsPage';
+import CategoriesPage from './CategoryPage';
 
 // Import other components
 
@@ -19,7 +21,8 @@ function App() {
           <Route path="/stores" element = {<StoresPage/>}/>
           <Route path="/product" element = {<ProductsPage/>}/>
           <Route path="/inventory" element = {<InventoryPage/>}/>
-
+          <Route path="/tag" element = {<TagsPage/>}/>
+          <Route path= "/category" element = {<CategoriesPage/>}/>
           {/* Define other routes */}
         </Routes>
       </div>

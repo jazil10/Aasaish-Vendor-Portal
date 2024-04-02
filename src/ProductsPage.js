@@ -255,32 +255,38 @@
 // export default ProductsPage;
 
 
-  import React, { useState, useEffect } from 'react';
-  import axios from 'axios';
-  import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, IconButton, Button, Modal, Box, TextField, Container,  Select, MenuItem, InputLabel, FormControl, Chip, OutlinedInput } from '@mui/material';
-  import Sidebar from './Sidebar';
-  import EditIcon from '@mui/icons-material/Edit';
-  import DeleteIcon from '@mui/icons-material/Delete';
-  import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, IconButton, Button, Modal, Box, TextField, Container, Select, MenuItem, InputLabel, FormControl, Chip, OutlinedInput
+} from '@mui/material';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from './firebase'; 
+import Sidebar from './Sidebar'; // Assuming this is a component you have
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-  function ProductsPage() {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]); // For storing categories
-    const [tags, setTags] = useState([]); // For storing tags
-    const [selectedTags, setSelectedTags] = useState([]); // For multi-select tags
-    const [open, setOpen] = useState(false); // For modal visibility
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentProduct, setCurrentProduct] = useState(null);
-    const [newProduct, setNewProduct] = useState({
-      brandId: '',
-      name: '',
-      description: '',
-      category: '',
-      tags: [],
-      price: '',
-      images: '',
-      offers: '',
-    });
+function ProductsPage() {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [images, setImages] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState({});
+  const [newProduct, setNewProduct] = useState({
+    brandId: '',
+    name: '',
+    description: '',
+    category: '',
+    tags: [],
+    price: '',
+    images: [],
+    offers: '',
+  });
+
     const [currentVendor, setCurrentVendor] = useState({
       name: '',
       brand: '',
@@ -369,6 +375,24 @@
         typeof value === 'string' ? value.split(',') : value,
       );
     };
+
+    const handleImageChange = (event) => {
+      setImages([...event.target.files]);
+    };
+  
+    const uploadImages = async () => {
+      const urls = await Promise.all(
+        images.map(async (image) => {
+          // Correctly obtain a reference to the storage location for each image
+          const imageRef = ref(storage, `products/${image.name}`);
+          // Upload the file
+          await uploadBytes(imageRef, image);
+          // Get the download URL
+          return getDownloadURL(imageRef);
+        })
+      );
+      return urls;
+    };
   
     const handleEdit = (product) => {
       setOpen(true);
@@ -422,21 +446,26 @@
       }));
     };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      //const payload = isEditing ? currentProduct : { ...newProduct};
-      const payload = { ...newProduct , tags: selectedTags};
-      console.log("payoad" + payload);
+    const handleSubmit = async (event) => {
+      event.preventDefault();
+      // Upload images first
+      const uploadedImageUrls = await uploadImages();
+      const formData = {
+        ...newProduct,
+        tags: selectedTags,
+        images: uploadedImageUrls,
+      };
+  
       try {
         if (isEditing) {
-          await axios.put(`http://localhost:4000/Product/updateproducts/${currentProduct._id}`, payload);
+          await axios.put(`http://localhost:4000/Product/updateproducts/${currentProduct._id}`, formData);
         } else {
-          await axios.post('http://localhost:4000/Product/createproducts', payload);
+          await axios.post('http://localhost:4000/Product/createproducts', formData);
         }
-        fetchProducts(); // Refresh the products list
-        handleClose(); // Close the modal
+        setOpen(false); // Close modal
+        // Refresh your products list here
       } catch (error) {
-        console.error("Error submitting form:", error);
+        console.error('Failed to submit product', error);
       }
     };
 
@@ -471,7 +500,13 @@
                 <TextField margin="normal" fullWidth label="Description" name="description" value={newProduct.description} onChange={handleChange} />
                 <TextField margin="normal" fullWidth label="Price" type="number" name="price" value={newProduct.price} onChange={handleChange} />
                 <TextField margin="normal" fullWidth label="Image URL" name="images" value={newProduct.images} onChange={handleChange} />
-                
+                <input
+                accept="image/*"
+                type="file"
+                multiple
+                onChange={handleImageChange}
+                style={{ margin: '10px 0' }}
+              />
                 <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
                   <InputLabel id="category-label">Category</InputLabel>
                   <Select

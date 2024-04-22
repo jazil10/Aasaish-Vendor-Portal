@@ -8,6 +8,8 @@ import InventoryPage from './InventoryPage';
 import TagsPage from './TagsPage';
 import CategoriesPage from './CategoryPage';
 import CollectionsPage from './CollectionsPage';
+import SalesPerformanceChart from './Analytics';
+import AnalyticsPage from './Analytics';
 
 // Import other components
 
@@ -25,6 +27,7 @@ function App() {
           <Route path="/tag" element = {<TagsPage/>}/>
           <Route path= "/category" element = {<CategoriesPage/>}/>
           <Route path= "/collection" element = {<CollectionsPage/>}/>
+          <Route path= "/analytics" element = {<AnalyticsPage/>}/>
 
           {/* Define other routes */}
         </Routes>

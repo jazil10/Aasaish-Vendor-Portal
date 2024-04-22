@@ -4,7 +4,9 @@ import {
   Button, Typography, Modal, Box, TextField, FormGroup, FormControlLabel, Checkbox, Container, CssBaseline, createTheme, ThemeProvider, Select, MenuItem, InputLabel, FormControl
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import these from Firebase
+import { storage } from './firebase'; // Make sure to configure your Firebase project and export 'storage'
+import '../config'
 const theme = createTheme();
 
 const CollectionsPage = () => {
@@ -12,10 +14,11 @@ const CollectionsPage = () => {
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [images, setImages] = useState([]); // Change to handle file inputs for images
   const [newCollection, setNewCollection] = useState({
     name: '',
     description: '',
-    imageUrl: '',
+    images: [],
   });
   const [brandForProducts, setBrandForProducts] = useState('');
 
@@ -63,6 +66,21 @@ const CollectionsPage = () => {
     setNewCollection(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (event) => {
+    setImages([...event.target.files]); // Handle file inputs
+  };
+
+  const uploadImages = async () => {
+    const urls = await Promise.all(
+      images.map(async (image) => {
+        const imageRef = ref(storage, `collections/${image.name}`);
+        await uploadBytes(imageRef, image);
+        return getDownloadURL(imageRef);
+      })
+    );
+    return urls;
+  };
+
   const handleProductChange = (event) => {
     const productId = event.target.value;
     const isChecked = event.target.checked;
@@ -72,6 +90,7 @@ const CollectionsPage = () => {
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const uploadedImageUrls = await uploadImages(); // Upload images and get their URLs
     const collectionData = {
       ...newCollection,
       products: selectedProducts,
@@ -89,6 +108,7 @@ const CollectionsPage = () => {
         imageUrl: '',
       });
       setSelectedProducts([]);
+      setImages([]);
     } catch (error) {
       console.error("Error creating collection:", error.response ? error.response.data : error); // Log detailed error
     }
@@ -119,7 +139,13 @@ const CollectionsPage = () => {
             <Typography variant="h6">New Collection</Typography>
             <TextField margin="normal" fullWidth name="name" label="Collection Name" value={newCollection.name} onChange={handleChange} />
             <TextField margin="normal" fullWidth name="description" label="Description" value={newCollection.description} onChange={handleChange} />
-            <TextField margin="normal" fullWidth name="imageUrl" label="Image URL" value={newCollection.imageUrl} onChange={handleChange} />
+            <input
+            accept="image/*"
+            type="file"
+            multiple
+            onChange={handleImageChange}
+            style={{ display: 'block', margin: '10px 0' }}
+            />
             <FormGroup>
               {products.map((product) => (
                 <FormControlLabel

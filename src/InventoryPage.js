@@ -6,9 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 //import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {Paper, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, FormControl, InputLabel, Select, MenuItem, Button, Dialog, DialogActions, DialogContent, DialogTitle, Container } from '@mui/material';
-
-
-const baseURL = "http://localhost:4000";
+import '../config'
 
 const InventoryManagementPage = () => {
     const [open, setOpen] = useState(false);
@@ -70,7 +68,7 @@ const InventoryManagementPage = () => {
         setSelectedStore(store);
         try {
             // Assuming you have an endpoint to get products by store  /getinventory/productsByStore/:storeId
-            const response = await axios.get(`${baseURL}/Inventory/getinventory/productsByStore/${store._id}`);
+            const response = await axios.get(`${BASE_URL}/Inventory/getinventory/productsByStore/${store._id}`);
             setProducts(response.data); // Assuming the response contains an array of products
             setProductDialogOpen(true); // Open the products dialog
         } catch (error) {
@@ -85,7 +83,7 @@ const InventoryManagementPage = () => {
         }
     
         try {
-            const response = await axios.get(`${baseURL}/Inventory/getinventory/getInventoryByStoreAndProduct/${selectedStore._id}/${product._id}`);
+            const response = await axios.get(`${BASE_URL}/Inventory/getinventory/getInventoryByStoreAndProduct/${selectedStore._id}/${product._id}`);
             console.log(response.data);
             // Directly access the 'variants' property of the response data
             const inventoryDetails = response.data.variants.map(variant => ({
@@ -117,7 +115,7 @@ const InventoryManagementPage = () => {
     //     try {
     //         // This API endpoint should return inventory details for the selected product
     //         // Adjust the endpoint as needed http://localhost:4000/Inventory/getinventory/product/:productId
-    //         const response = await axios.get(`${baseURL}/Inventory/getinventory/product/${product._id}`);
+    //         const response = await axios.get(`${BASE_URL}/Inventory/getinventory/product/${product._id}`);
     //         const inventoryDetails = response.data.map(item => ({
     //             productName: item.productId.name,
     //             productDescription: item.productId.description,
@@ -169,7 +167,7 @@ const InventoryManagementPage = () => {
 
         const fetchVendorDetails = async () => {
             try {
-                const { data: vendorDetails } = await axios.get(`${baseURL}/User/vendorbyid`);
+                const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
                 brandId = vendorDetails.brand._id;
                 console.log(brandId);
                 fetchProductsByBrand(brandId);
@@ -182,7 +180,7 @@ const InventoryManagementPage = () => {
         const fetchProductsByBrand = async (brandId) => {
             try {
                 console.log("fn:"+brandId);
-                const { data: productsData } = await axios.get(`${baseURL}/Product/getproductsbybrand/${brandId}`);
+                const { data: productsData } = await axios.get(`${BASE_URL}/Product/getproductsbybrand/${brandId}`);
                 console.log("prodata: "+productsData);
                 setProducts(productsData);
             } catch (error) {
@@ -193,7 +191,7 @@ const InventoryManagementPage = () => {
         const fetchStoresByBrand = async (brandId) => {
             try {
                 console.log("for store" +brandId);
-                const { data: storesData } = await axios.get(`${baseURL}/Store//getstoresbybrand/${brandId}`);
+                const { data: storesData } = await axios.get(`${BASE_URL}/Store//getstoresbybrand/${brandId}`);
                 console.log("storedata: "+storesData);
                 setStores(storesData);
             } catch (error) {
@@ -256,7 +254,7 @@ const InventoryManagementPage = () => {
             if (isEditing) {
                 // Update inventory item logic, ensure it supports the adjusted structure
             } else {
-                await axios.post(`${baseURL}/Inventory/createinventory`, inventoryItem);
+                await axios.post(`${BASE_URL}/Inventory/createinventory`, inventoryItem);
             }
             handleClose();
         } catch (error) {
@@ -494,7 +492,7 @@ export default InventoryManagementPage;
 // import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 // import {TextField, Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
-// const baseURL = "http://localhost:4000";
+// const BASE_URL = "http://localhost:4000";
 
 // const InventoryManagementPage = () => {
 //     const [products, setProducts] = useState([]);
@@ -516,18 +514,18 @@ export default InventoryManagementPage;
 //         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
 //         const fetchProducts = async () => {
-//             const response = await axios.get(`${baseURL}/Product/getproducts`);
+//             const response = await axios.get(`${BASE_URL}/Product/getproducts`);
 //             setProducts(response.data);
 //         };
 
 //         const fetchStores = async () => {
-//             const response = await axios.get(`${baseURL}/Store//getstoresbybrand/:brandId`);
+//             const response = await axios.get(`${BASE_URL}/Store//getstoresbybrand/:brandId`);
 //             setStores(response.data);
 //         };
 
 //         const fetchVendorDetails = async () => {
 //             try {
-//                 const { data: vendorDetails } = await axios.get(`${baseURL}/User/vendorbyid`);
+//                 const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
 //                 brandId = vendorDetails.brand._id;
 //                 console.log(brandId);
 //                 fetchProductsByBrand(brandId);
@@ -540,7 +538,7 @@ export default InventoryManagementPage;
 //         const fetchProductsByBrand = async (brandId) => {
 //             try {
 //                 console.log("fn:"+brandId);
-//                 const { data: productsData } = await axios.get(`${baseURL}/Product/getproductsbybrand/${brandId}`);
+//                 const { data: productsData } = await axios.get(`${BASE_URL}/Product/getproductsbybrand/${brandId}`);
 //                 console.log("prodata: "+productsData);
 //                 setProducts(productsData);
 //             } catch (error) {
@@ -551,7 +549,7 @@ export default InventoryManagementPage;
 //         const fetchStoresByBrand = async (brandId) => {
 //             try {
 //                 console.log("for store" +brandId);
-//                 const { data: storesData } = await axios.get(`${baseURL}/Store/getproductsbystore/${brandId}`);
+//                 const { data: storesData } = await axios.get(`${BASE_URL}/Store/getproductsbystore/${brandId}`);
 //                 console.log("storedata: "+storesData);
 //                 setStores(storesData);
 //             } catch (error) {
@@ -560,7 +558,7 @@ export default InventoryManagementPage;
 //         };
 
 //         const fetchInventory = async () => {
-//             const response = await axios.get(`${baseURL}/Inventory/allinventory`);
+//             const response = await axios.get(`${BASE_URL}/Inventory/allinventory`);
 //             setInventory(response.data);
 //         };
 
@@ -618,7 +616,7 @@ export default InventoryManagementPage;
 //             if (isEditing) {
 //                 // Update inventory item logic, ensure it supports the adjusted structure
 //             } else {
-//                 await axios.post(`${baseURL}/Inventory/createinventory`, inventoryItem);
+//                 await axios.post(`${BASE_URL}/Inventory/createinventory`, inventoryItem);
 //             }
 //             handleClose();
 //         } catch (error) {

@@ -264,9 +264,10 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from './firebase'; 
 import Sidebar from './Sidebar'; // Assuming this is a component you have
 import EditIcon from '@mui/icons-material/Edit';
+import '../config'
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
+import '../config';
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -299,7 +300,7 @@ function ProductsPage() {
 
       const fetchVendorDetails = async () => {
         try {
-          const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+          const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
           console.log("brand:" + vendorDetails.brandId);
           setCurrentVendor(prevState => ({
             ...prevState,
@@ -324,7 +325,7 @@ function ProductsPage() {
 
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/Product/getproducts');
+        const response = await axios.get(`${BASE_URL}/Product/getproducts`);
         setProducts(response.data);
       } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -333,7 +334,7 @@ function ProductsPage() {
 
     const fetchCategories = async () => {
       try {
-          const response = await axios.get('http://localhost:4000/Category/categories'); // Adjust the URL as per your setup
+          const response = await axios.get(`${BASE_URL}/Category/categories`); // Adjust the URL as per your setup
           setCategories(response.data); // Assuming you have a useState hook to manage categories
       } catch (error) {
           console.error("Failed to fetch categories:", error);
@@ -348,7 +349,7 @@ function ProductsPage() {
         }
 
         try {
-            const response = await axios.get(`http://localhost:4000/Tag/by-category/${parentCategoryId}`); // Adjust the URL as per your setup
+            const response = await axios.get(`${BASE_URL}/Tag/by-category/${parentCategoryId}`); // Adjust the URL as per your setup
             setTags(response.data); // Assuming you have a useState hook to manage tags
             setSelectedTags([]); // Reset selected tags if any
         } catch (error) {
@@ -428,7 +429,7 @@ function ProductsPage() {
       }
     
       try {
-        const response = await axios.delete(`http://localhost:4000/Product/deleteproducts/${id}`);
+        const response = await axios.delete(`${BASE_URL}/Product/deleteproducts/${id}`);
         console.log('Delete response:', response.data); // For debugging
         fetchProducts(); // Refresh the list after deleting
       } catch (error) {
@@ -458,9 +459,9 @@ function ProductsPage() {
   
       try {
         if (isEditing) {
-          await axios.put(`http://localhost:4000/Product/updateproducts/${currentProduct._id}`, formData);
+          await axios.put(`${BASE_URL}/Product/updateproducts/${currentProduct._id}`, formData);
         } else {
-          await axios.post('http://localhost:4000/Product/createproducts', formData);
+          await axios.post(`${BASE_URL}/Product/createproducts`, formData);
         }
         setOpen(false); // Close modal
         // Refresh your products list here
@@ -499,7 +500,6 @@ function ProductsPage() {
                 <TextField margin="normal" fullWidth label="Name" name="name" value={newProduct.name} onChange={handleChange} />
                 <TextField margin="normal" fullWidth label="Description" name="description" value={newProduct.description} onChange={handleChange} />
                 <TextField margin="normal" fullWidth label="Price" type="number" name="price" value={newProduct.price} onChange={handleChange} />
-                <TextField margin="normal" fullWidth label="Image URL" name="images" value={newProduct.images} onChange={handleChange} />
                 <input
                 accept="image/*"
                 type="file"

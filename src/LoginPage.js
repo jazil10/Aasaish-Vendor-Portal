@@ -3,6 +3,7 @@ import { TextField, Button, Paper, Typography, Container, Grid, Box } from '@mui
 import { FaTshirt } from 'react-icons/fa';
 import axios from 'axios';
 import './LoginPage.css';
+import '../config';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -18,7 +19,7 @@ function LoginPage() {
     try {
       // Assuming your login API endpoint is '/api/login'
       // Update the URL to match your actual login endpoint
-      const response = await axios.post('http://localhost:4000/User/login', {
+      const response = await axios.post(`${BASE_URL}/User/login`, {
         email: username, // Adjust according to your API's expected payload
         password: password,
       });

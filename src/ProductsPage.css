@@ -1,24 +1,93 @@
 .products-container {
-    padding: 20px;
-  }
-  
-  .product-form {
-    margin-bottom: 20px;
-  }
-  
-  .product-form input, .product-form textarea {
-    display: block;
-    margin-bottom: 10px;
-  }
-  
-  .product-item {
-    border: 1px solid #ccc;
+  padding: 20px;
+  margin-left: 240px; /* Adjust if the sidebar is dynamic */
+  width: auto; /* Ensures it takes the available space */
+  overflow-x: auto; /* Allows for horizontal scrolling if table overflows */
+}
+
+.product-form {
+  margin-bottom: 20px;
+}
+
+.product-form input, .product-form textarea, .product-form select {
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.product-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: #fff;
+}
+
+.product-item img {
+  width: auto; /* Keep the image's aspect ratio */
+  height: 150px; /* Set a fixed height */
+  display: block;
+  object-fit: contain; /* Ensures the image fits well within the dimensions */
+}
+
+/* Table Styles */
+.TableContainer {
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.TableHead {
+  background-color: #f5f5f5;
+}
+
+.TableRow {
+  transition: background-color 0.3s ease;
+}
+
+.TableRow:hover {
+  background-color: #eaeaea;
+}
+
+.TableCell {
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Buttons */
+.Button {
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.Button-primary {
+  background-color: #0056b3;
+  color: white;
+}
+
+.Button-secondary {
+  background-color: #e53935;
+  color: white;
+}
+
+.Button:hover {
+  opacity: 0.8;
+}
+
+/* Responsiveness */
+@media screen and (max-width: 768px) {
+  .products-container {
+    margin-left: 0;
     padding: 10px;
-    margin-bottom: 10px;
   }
-  
-  .product-item img {
-    max-width: 150px;
-    max-height: 150px;
+
+  .product-item, .product-form input, .product-form textarea, .product-form select {
+    width: 100%;
   }
-  
+}

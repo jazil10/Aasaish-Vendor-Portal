@@ -1,12 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './Navbar';
 import ProductsPage from './ProductsPage';
 import StoresPage from './StoresPage';
 import LoginPage from './LoginPage';
 import InventoryPage from './InventoryPage';
 import TagsPage from './TagsPage';
 import CategoriesPage from './CategoryPage';
+import { SnackbarProvider } from 'notistack';
+
 import CollectionsPage from './CollectionsPage';
 import SalesPerformanceChart from './Analytics';
 import AnalyticsPage from './Analytics';
@@ -15,6 +16,7 @@ import AnalyticsPage from './Analytics';
 
 function App() {
   return (
+    <SnackbarProvider maxSnack={3}>
     <Router>
       <div className="App">
         
@@ -33,6 +35,8 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </SnackbarProvider>
+
   );
 }
 

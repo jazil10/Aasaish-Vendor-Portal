@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 // Importing Axios for HTTP requests
 import axios from 'axios';
 
+import './ProductsPage.css';
+
 // Importing Material-UI components
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -141,14 +143,16 @@ const fetchVendorDetails = async () => {
 // Product Management -----------------------
 // Functions to handle CRUD operations on products
 const fetchProducts = async () => {
-  // Fetch list of all products
   try {
-    const response = await axios.get('http://localhost:4000/Product/getproducts');
+    const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+    const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;    // Replace this with actual store ID retrieval logic
+    const response = await axios.get(`http://localhost:4000/Product/by-store/${storeId}`);
     setProducts(response.data);
   } catch (error) {
     console.error("Failed to fetch products:", error);
   }
 };
+
 
 const handleOpenForAdd = () => {
   setOpen(true);
@@ -520,7 +524,6 @@ const isIndeterminate = selectedProducts.size > 0 && selectedProducts.size < pro
     overflowY: 'auto', // Make content scrollable
   };
   
-
   return (
     <Container maxWidth="lg">
       <Box sx={{ display: "flex" }}>
@@ -671,26 +674,30 @@ const isIndeterminate = selectedProducts.size > 0 && selectedProducts.size < pro
               />
               {file && <Typography>Selected file: {file.name}</Typography>}
               {fileHeaders.length > 0 && (
-      <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
-        <InputLabel id="bulk-import-collection-label">Collection</InputLabel>
-        <Select
-          labelId="bulk-import-collection-label"
-          value={bulkImportCollection}
-          onChange={(event) => setBulkImportCollection(event.target.value)}
-          displayEmpty
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
-          <MenuItem value="">
-            <em></em>
-          </MenuItem>
-          {collections.map((collection) => (
-            <MenuItem key={collection._id} value={collection._id}>
-              {collection.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    )}
+                <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+                  <InputLabel id="bulk-import-collection-label">
+                    Collection
+                  </InputLabel>
+                  <Select
+                    labelId="bulk-import-collection-label"
+                    value={bulkImportCollection}
+                    onChange={(event) =>
+                      setBulkImportCollection(event.target.value)
+                    }
+                    displayEmpty
+                    inputProps={{ "aria-label": "Without label" }}
+                  >
+                    <MenuItem value="">
+                      <em></em>
+                    </MenuItem>
+                    {collections.map((collection) => (
+                      <MenuItem key={collection._id} value={collection._id}>
+                        {collection.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
               {fileHeaders.length > 0 && (
                 <Grid container spacing={2}>
                   {/* Mapping for basic product fields */}
@@ -962,66 +969,84 @@ const isIndeterminate = selectedProducts.size > 0 && selectedProducts.size < pro
           </Modal>
   
           <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      indeterminate={isIndeterminate}
-                      checked={isAllSelected}
-                      onChange={handleSelectAllClick}
-                    />
-                  </TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Discount</TableCell>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {products.map((product) => (
-                  <TableRow
-                    key={product.id}
-                    selected={selectedProducts.has(product.id)}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedProducts.has(product.id)}
-                        onChange={() => handleClick(product.id)}
-                      />
-                    </TableCell>
-                    <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.description}</TableCell>
-                    <TableCell>{product.price}</TableCell>
-                    <TableCell>{product.discount}</TableCell>
-                    <TableCell>
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        style={{ width: 100, height: 100 }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="secondary"
-                        onClick={() => handleDeleteProduct(product._id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+  <Table sx={{ width: '100%' }} aria-label="customized table">
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            indeterminate={isIndeterminate}
+            checked={isAllSelected}
+            onChange={handleSelectAllClick}
+          />
+        </TableCell>
+        <TableCell style={{ width: '15%' }}>Product ID</TableCell>
+        <TableCell style={{ width: '15%' }}>Name</TableCell>
+        <TableCell style={{ width: '20%' }}>Description</TableCell>
+        <TableCell style={{ width: '10%' }}>Price</TableCell>
+        <TableCell style={{ width: '10%' }}>Category</TableCell>
+        <TableCell style={{ width: '10%' }}>Tags</TableCell>
+        <TableCell style={{ width: '10%' }}>Colors</TableCell>
+        <TableCell style={{ width: '10%' }}>Sizes</TableCell>
+        <TableCell style={{ width: '100px' }}>Image</TableCell> {/* Fixed width for image column */}
+        <TableCell>Actions</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {products.map((product) => (
+        <TableRow
+          key={product.id}
+          selected={selectedProducts.has(product.id)}
+        >
+          <TableCell padding="checkbox">
+            <Checkbox
+              checked={selectedProducts.has(product.id)}
+              onChange={() => handleClick(product.id)}
+            />
+          </TableCell>
+          <TableCell>{product.id}</TableCell>
+          <TableCell>{product.name}</TableCell>
+          <TableCell>{product.description}</TableCell>
+          <TableCell>{product.price}</TableCell>
+          <TableCell>
+            {product.category ? product.category.name : "N/A"}
+          </TableCell>
+          <TableCell>
+            {product.tags.map((tag) => tag.name).join(", ")}
+          </TableCell>
+          <TableCell>
+            {product.variants
+              .map((variant) => variant.color)
+              .join(", ")}
+          </TableCell>
+          <TableCell>
+            {product.variants.map((variant) => variant.size).join(", ")}
+          </TableCell>
+          <TableCell>
+            <img
+              src={product.images && product.images[0]}
+              alt={product.name}
+              style={{ width: '100%', height: 'auto' }} // making image responsive within the fixed width cell
+            />
+          </TableCell>
+          <TableCell>
+            <IconButton
+              color="primary"
+              onClick={() => handleEdit(product)}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              color="secondary"
+              onClick={() => handleDeleteProduct(product.id)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
         </Box>
       </Box>
     </Container>

@@ -39,14 +39,14 @@ return (
         </Typography>
       </Box>
     <List>
-      {['DASHBOARD', 'STORE', 'PRODUCTS','OFFERS', 'LOGOUT'].map((text, index) => (
+      {['DASHBOARD', 'STORE', 'PRODUCTS','INVENTORY', 'LOGOUT'].map((text, index) => (
         <ListItem
           button
           key={text}
           onClick={() => handleNavigation(index === 0 ? '/dashboard' : 
                                            index === 1 ? '/stores' : 
                                            index === 2 ? '/product' : 
-                                           index === 3 ? '/offers' : 
+                                           index === 3 ? '/inventory' : 
                                            '/login')}
           sx={{
             borderRadius: '20px', // More pronounced rounded list items

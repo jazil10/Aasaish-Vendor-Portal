@@ -8,6 +8,7 @@ import TagsPage from './TagsPage';
 import CategoriesPage from './CategoryPage';
 import { SnackbarProvider } from 'notistack';
 
+import CollectionsPage from './CollectionsPage';
 
 // Import other components
 
@@ -25,6 +26,8 @@ function App() {
           <Route path="/inventory" element = {<InventoryPage/>}/>
           <Route path="/tag" element = {<TagsPage/>}/>
           <Route path= "/category" element = {<CategoriesPage/>}/>
+          <Route path= "/collection" element = {<CollectionsPage/>}/>
+
           {/* Define other routes */}
         </Routes>
       </div>

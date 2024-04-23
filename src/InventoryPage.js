@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 //import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {Paper, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, FormControl, InputLabel, Select, MenuItem, Button, Dialog, DialogActions, DialogContent, DialogTitle, Container } from '@mui/material';
-import '../config'
+import { BASE_URL } from './config';
 
 const InventoryManagementPage = () => {
     const [open, setOpen] = useState(false);

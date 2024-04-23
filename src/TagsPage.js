@@ -7,7 +7,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { blue, pink } from '@mui/material/colors';
-import '../config';
+import './config';
+import { BASE_URL } from './config';
 const theme = createTheme({
   palette: {
     primary: {

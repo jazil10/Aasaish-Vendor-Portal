@@ -6,7 +6,8 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import these from Firebase
 import { storage } from './firebase'; // Make sure to configure your Firebase project and export 'storage'
-import '../config'
+import './config';
+import { BASE_URL } from './config';
 const theme = createTheme();
 
 const CollectionsPage = () => {
@@ -29,7 +30,7 @@ const CollectionsPage = () => {
   
     const fetchVendorDetails = async () => {
       try {
-        const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+        const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
         console.log("vendor brand " + vendorDetails.brand._id);
         setBrandForProducts(vendorDetails.brand._id);
       } catch (error) {
@@ -46,7 +47,7 @@ const CollectionsPage = () => {
       if (brandForProducts) { // Check if brandForProducts is not empty
         try {
           console.log('Fetching products for brand:', brandForProducts);
-          const { data } = await axios.get(`http://localhost:4000/Product/getproductsbybrand/${brandForProducts}`);
+          const { data } = await axios.get(`${BASE_URL}/Product/getproductsbybrand/${brandForProducts}`);
           setProducts(data);
         } catch (error) {
           console.error("Failed to fetch vendor's products:", error);
@@ -94,18 +95,19 @@ const CollectionsPage = () => {
     const collectionData = {
       ...newCollection,
       products: selectedProducts,
+      images: uploadedImageUrls, // Add the URLs to the collection data
       brand: brandForProducts, // Include the brand ID here
     };
     console.log('Submitting collection data:', collectionData); // Log data being sent
     try {
-      const response = await axios.post(`http://localhost:4000/Collection/createcollection`, collectionData);
+      const response = await axios.post(`${BASE_URL}/Collection/createcollection`, collectionData);
       console.log('Creation response:', response); // Log successful response
       setCollections([...collections, response.data]);
       handleClose();
       setNewCollection({
         name: '',
         description: '',
-        imageUrl: '',
+        images: '',
       });
       setSelectedProducts([]);
       setImages([]);
@@ -126,39 +128,41 @@ const CollectionsPage = () => {
           Add New Collection
         </Button>
         <Modal open={open} onClose={handleClose}>
-          <Box component="form" onSubmit={handleSubmit} sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-          }}>
-            <Typography variant="h6">New Collection</Typography>
-            <TextField margin="normal" fullWidth name="name" label="Collection Name" value={newCollection.name} onChange={handleChange} />
-            <TextField margin="normal" fullWidth name="description" label="Description" value={newCollection.description} onChange={handleChange} />
-            <input
-            accept="image/*"
-            type="file"
-            multiple
-            onChange={handleImageChange}
-            style={{ display: 'block', margin: '10px 0' }}
-            />
-            <FormGroup>
-              {products.map((product) => (
-                <FormControlLabel
-                  control={<Checkbox checked={selectedProducts.includes(product._id)} onChange={handleProductChange} value={product._id} />}
-                  label={product.name}
-                  key={product._id}
-                />
-              ))}
-            </FormGroup>
-            
-            <Button type="submit" color="primary" variant="contained">Create Collection</Button>
-          </Box>
-        </Modal>
+  <Box component="form" onSubmit={handleSubmit} sx={{
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400, // You might want to adjust the width based on your design requirements
+    maxHeight: '90vh', // Maximum height before scrolling
+    overflow: 'auto', // Allows scrolling
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+  }}>
+    <Typography variant="h6">New Collection</Typography>
+    <TextField margin="normal" fullWidth name="name" label="Collection Name" value={newCollection.name} onChange={handleChange} />
+    <TextField margin="normal" fullWidth name="description" label="Description" value={newCollection.description} onChange={handleChange} />
+    <input
+      accept="image/*"
+      type="file"
+      multiple
+      onChange={handleImageChange}
+      style={{ display: 'block', margin: '10px 0' }}
+    />
+    <FormGroup>
+      {products.map((product) => (
+        <FormControlLabel
+          control={<Checkbox checked={selectedProducts.includes(product._id)} onChange={handleProductChange} value={product._id} />}
+          label={product.name}
+          key={product._id}
+        />
+      ))}
+    </FormGroup>
+    <Button type="submit" color="primary" variant="contained">Create Collection</Button>
+  </Box>
+</Modal>
+
         {/* Display collections here */}
 
         <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>

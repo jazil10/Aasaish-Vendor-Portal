@@ -3,7 +3,8 @@ import { TextField, Button, Paper, Typography, Container, Grid, Box } from '@mui
 import { FaTshirt } from 'react-icons/fa';
 import axios from 'axios';
 import './LoginPage.css';
-import '../config';
+import './config';
+import { BASE_URL } from './config';
 
 function LoginPage() {
   const [username, setUsername] = useState('');

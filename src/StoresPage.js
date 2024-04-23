@@ -10,9 +10,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../config'
+import './config'
 import Sidebar from './Sidebar';
 import { blue, pink } from '@mui/material/colors';
+import { BASE_URL } from './config';
 
 const theme = createTheme({
   palette: {
@@ -227,7 +228,7 @@ const StoresPage = () => {
                       <TableCell>{store.name}</TableCell>
                       <TableCell>{store.address}</TableCell>
                       <TableCell>{store.contactInfo}</TableCell>
-                      <TableCell>{`Lat: ${store.location.coordinates[1]}, Lng: ${store.location.coordinates[0]}`}</TableCell>
+                      {/* <TableCell>{`Lat: ${store.location.coordinates[1]}, Lng: ${store.location.coordinates[0]}`}</TableCell> */}
                       <TableCell align="right">
                         <IconButton color="primary" onClick={() => handleEdit(store)}>
                           <EditIcon />

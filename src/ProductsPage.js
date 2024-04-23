@@ -264,10 +264,11 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from './firebase'; 
 import Sidebar from './Sidebar'; // Assuming this is a component you have
 import EditIcon from '@mui/icons-material/Edit';
-import '../config'
+import './config'
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import '../config';
+import './config';
+import { BASE_URL } from './config';
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);

@@ -60,7 +60,7 @@ const StoresPage = () => {
 
   const fetchStores = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:4000/Store/vendor`);
+      const { data } = await axios.get(`${BASE_URL}/Store/vendor`);
       setStores(data);
     } catch (error) {
       console.error("Failed to fetch stores:", error);

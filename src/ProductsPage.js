@@ -20,6 +20,7 @@ import { storage } from './firebase';
 // Importing custom components and icons
 import Sidebar from './Sidebar';
 import EditIcon from '@mui/icons-material/Edit';
+import './config'
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -30,6 +31,8 @@ import * as XLSX from 'xlsx';
 
 // Importing Snackbar for notifications
 import { useSnackbar } from 'notistack';
+
+import { BASE_URL } from './config';
 
 function ProductsPage() {
   // Snackbar for user notifications
@@ -117,7 +120,7 @@ useEffect(() => {
 // Functions related to fetching and setting vendor details
 const fetchVendorDetails = async () => {
   try {
-    const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+    const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
     const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;
 
     console.log("brand:" + vendorDetails.brand._id); // Log brand ID
@@ -145,9 +148,9 @@ const fetchVendorDetails = async () => {
 // Functions to handle CRUD operations on products
 const fetchProducts = async () => {
   try {
-    const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+    const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
     const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;    // Replace this with actual store ID retrieval logic
-    const response = await axios.get(`http://localhost:4000/Product/by-store/${storeId}`);
+    const response = await axios.get(`${BASE_URL}/Product/by-store/${storeId}`);
     setProducts(response.data);
   } catch (error) {
     console.error("Failed to fetch products:", error);
@@ -200,7 +203,7 @@ const handleDeleteProduct = async (id) => {
   }
   
   try {
-    const response = await axios.delete(`http://localhost:4000/Product/deleteproducts/${id}`);
+    const response = await axios.delete(`${BASE_URL}/Product/deleteproducts/${id}`);
     console.log('Delete response:', response.data); // For debugging
     fetchProducts(); // Refresh the list after deleting
   } catch (error) {
@@ -222,9 +225,9 @@ const handleSubmit = async (event) => {
   try {
     let productResponse;
     if (isEditing) {
-      productResponse = await axios.put(`http://localhost:4000/Product/updateproducts/${currentProduct._id}`, formData);
+      productResponse = await axios.put(`${BASE_URL}/Product/updateproducts/${currentProduct._id}`, formData);
     } else {
-      productResponse = await axios.post('http://localhost:4000/Product/createproducts', formData);
+      productResponse = await axios.post(`${BASE_URL}/Product/createproducts`, formData);
     }
     
     const productId = productResponse.data._id;
@@ -237,7 +240,7 @@ const handleSubmit = async (event) => {
       offers: inventory.offers
     };
     
-    await axios.post('http://localhost:4000/Inventory/createinventory', inventoryData);
+    await axios.post(`${BASE_URL}/Inventory/createinventory`, inventoryData);
     
     setOpen(false); // Close modal
     showSuccessSnackbar(isEditing ? 'Product Updated' : 'Product Added'); // Display success notification
@@ -251,7 +254,7 @@ const handleSubmit = async (event) => {
 // Functions to handle CRUD operations on collections
 const fetchCollections = async () => {
   try {
-    const response = await axios.get('http://localhost:4000/Collection/collections');
+    const response = await axios.get(`${BASE_URL}/Collection/collections`);
     setCollections(response.data);
   } catch (error) {
     console.error("Failed to fetch collections:", error);
@@ -269,7 +272,7 @@ const editCollection = (collection) => {
 
 const deleteCollection = async (id) => {
   try {
-    await axios.delete(`http://localhost:4000/Collection/deletecollections/${id}`);
+    await axios.delete(`${BASE_URL}/Collection/deletecollections/${id}`);
     fetchCollections(); // Refresh collections after delete
     enqueueSnackbar('Collection Deleted', { variant: 'success' });
   } catch (error) {
@@ -282,8 +285,8 @@ const handleCollectionSubmit = async (event) => {
   event.preventDefault();
   try {
     const response = isEditingCollection ?
-      await axios.put(`http://localhost:4000/Collection/updatecollections/${currentCollection._id}`, currentCollection) : // Corrected URL for PUT
-      await axios.post('http://localhost:4000/Collection/createcollection', currentCollection); // Corrected URL for POST
+      await axios.put(`${BASE_URL}/Collection/updatecollections/${currentCollection._id}`, currentCollection) : // Corrected URL for PUT
+      await axios.post(`${BASE_URL}/Collection/createcollection`, currentCollection); // Corrected URL for POST
     
     enqueueSnackbar(isEditingCollection ? 'Collection Updated' : 'Collection Added', { variant: 'success' });
     fetchCollections();
@@ -298,7 +301,7 @@ const handleCollectionSubmit = async (event) => {
 // Functions to handle fetching and managing categories and tags
 const fetchCategories = async () => {
   try {
-      const response = await axios.get('http://localhost:4000/Category/categories');
+      const response = await axios.get(`${BASE_URL}/Category/categories`);
       setCategories(response.data);
   } catch (error) {
       console.error("Failed to fetch categories:", error);
@@ -321,7 +324,7 @@ const fetchTags = async (parentCategoryId) => {
   }
 
   try {
-    const response = await axios.get(`http://localhost:4000/Tag/by-category/${parentCategoryId}`);
+    const response = await axios.get(`${BASE_URL}/Tag/by-category/${parentCategoryId}`);
     setTags(response.data);
     setSelectedTags([]); // Reset selected tags if any
   } catch (error) {
@@ -447,7 +450,7 @@ const handleBulkImportSubmit = async (event) => {
 
 
   try {
-    const response = await axios.post('http://localhost:4000/Product/bulk-import', formData, {
+    const response = await axios.post(`${BASE_URL}/Product/bulk-import`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

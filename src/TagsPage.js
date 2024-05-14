@@ -7,7 +7,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { blue, pink } from '@mui/material/colors';
-
+import './config';
+import { BASE_URL } from './config';
 const theme = createTheme({
   palette: {
     primary: {
@@ -47,7 +48,7 @@ const TagsPage = () => {
 
   const fetchTags = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:4000/Tag/tags`);
+      const { data } = await axios.get(`${BASE_URL}/Tag/tags`);
       console.log("Tags:", data); // Debugging line to inspect tags
       setTags(data);
       setParentTags(data.filter(tag => !tag.parentTag));
@@ -62,7 +63,7 @@ const TagsPage = () => {
     
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/Category/categories');
+        const response = await axios.get(`${BASE_URL}/Category/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -107,13 +108,13 @@ const TagsPage = () => {
   
         console.log(`Submitting tag: ${currentTag.name}, Parent Category: ${parentCategoryObj ? parentCategoryObj.name : 'None'}`);
 
-        await axios.put(`http://localhost:4000/Tag/updatetag/${currentTag._id}`, currentTag);
+        await axios.put(`${BASE_URL}/Tag/updatetag/${currentTag._id}`, currentTag);
         console.log(tags);
         console.log(categories);
 
       } else {
         console.log(currentTag);
-        await axios.post(`http://localhost:4000/Tag/createtag`, currentTag);
+        await axios.post(`${BASE_URL}/Tag/createtag`, currentTag);
 
       }
       setOpen(false);
@@ -125,7 +126,7 @@ const TagsPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/Tag/deletetag/${id}`);
+      await axios.delete(`${BASE_URL}/Tag/deletetag/${id}`);
       await fetchTags();
     } catch (error) {
       console.error("Failed to delete tag:", error);

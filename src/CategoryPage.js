@@ -7,6 +7,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { blue, pink } from '@mui/material/colors';
+import './config'
+import { BASE_URL } from './config';
 
 const theme = createTheme({
   palette: {
@@ -44,7 +46,7 @@ const CategoriesPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:4000/Category/categories`);
+      const { data } = await axios.get(`${BASE_URL}/Category/categories`);
       setCategories(data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
@@ -88,9 +90,9 @@ const CategoriesPage = () => {
     console.log('Submitting form...', currentCategory);
     try {
       if (isEditing) {
-        await axios.put(`http://localhost:4000/Category/updatecategory/${currentCategory._id}`, currentCategory);
+        await axios.put(`${BASE_URL}/Category/updatecategory/${currentCategory._id}`, currentCategory);
       } else {
-        await axios.post(`http://localhost:4000/Category/createcategory`, currentCategory);
+        await axios.post(`${BASE_URL}/Category/createcategory`, currentCategory);
       }
       setOpen(false);
       await fetchCategories();
@@ -101,7 +103,7 @@ const CategoriesPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/Category/deletecategory/${id}`);
+      await axios.delete(`${BASE_URL}/Category/deletecategory/${id}`);
       await fetchCategories();
     } catch (error) {
       console.error("Failed to delete category:", error);

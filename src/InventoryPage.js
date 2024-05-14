@@ -25,6 +25,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 // Importing Snackbar for notifications
 import { useSnackbar } from 'notistack';
+import { BASE_URL } from './config';
 
 function InventoryPage() {
   // Snackbar for user notifications
@@ -81,7 +82,7 @@ useEffect(() => {
 // Functions related to fetching and setting vendor details
 const fetchVendorDetails = async () => {
   try {
-    const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+    const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
     const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;
 
     console.log("brand:" + vendorDetails.brand._id); // Log brand ID
@@ -102,9 +103,9 @@ const fetchVendorDetails = async () => {
 // Functions to handle CRUD operations on products
 const fetchProducts = async () => {
   try {
-    const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+    const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
     const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;    // Replace this with actual store ID retrieval logic
-    const response = await axios.get(`http://localhost:4000/Product/by-store/${storeId}`);
+    const response = await axios.get(`${BASE_URL}/Product/by-store/${storeId}`);
     setProducts(response.data);
   } catch (error) {
     console.error("Failed to fetch products:", error);

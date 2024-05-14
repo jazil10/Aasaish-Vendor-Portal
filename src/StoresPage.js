@@ -10,8 +10,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import './config'
 import Sidebar from './Sidebar';
 import { blue, pink } from '@mui/material/colors';
+import { BASE_URL } from './config';
 
 const theme = createTheme({
   palette: {
@@ -58,7 +60,7 @@ const StoresPage = () => {
 
   const fetchStores = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:4000/Store/vendor`);
+      const { data } = await axios.get(`${BASE_URL}/Store/vendor`);
       setStores(data);
     } catch (error) {
       console.error("Failed to fetch stores:", error);
@@ -72,7 +74,7 @@ const StoresPage = () => {
 
     const fetchVendorDetails = async () => {
       try {
-        const { data: vendorDetails } = await axios.get(`http://localhost:4000/User/vendorbyid`);
+        const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
         console.log(vendorDetails.brand);
         setCurrentStore(prevState => ({
           ...prevState,
@@ -134,9 +136,9 @@ const StoresPage = () => {
     console.log(payload);
     try {
       if (isEditing) {
-        await axios.put(`http://localhost:4000/Store/${currentStore._id}`, payload);
+        await axios.put(`${BASE_URL}/Store/${currentStore._id}`, payload);
       } else {
-        await axios.post(`http://localhost:4000/Store/create`, payload);
+        await axios.post(`${BASE_URL}/Store/create`, payload);
       }
       setOpen(false);
       // Call fetchStores here after the update to refresh the list
@@ -148,7 +150,7 @@ const StoresPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/Store/${id}`);
+      await axios.delete(`${BASE_URL}/Store/${id}`);
       // Call fetchStores here after deletion to refresh the list
       await fetchStores();
     } catch (error) {
@@ -226,7 +228,7 @@ const StoresPage = () => {
                       <TableCell>{store.name}</TableCell>
                       <TableCell>{store.address}</TableCell>
                       <TableCell>{store.contactInfo}</TableCell>
-                      <TableCell>{`Lat: ${store.location.coordinates[1]}, Lng: ${store.location.coordinates[0]}`}</TableCell>
+                      {/* <TableCell>{`Lat: ${store.location.coordinates[1]}, Lng: ${store.location.coordinates[0]}`}</TableCell> */}
                       <TableCell align="right">
                         <IconButton color="primary" onClick={() => handleEdit(store)}>
                           <EditIcon />

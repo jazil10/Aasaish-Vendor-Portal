@@ -51,6 +51,13 @@ function InventoryPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
 
+    // State for search query
+    const [searchQuery, setSearchQuery] = useState('');
+
+  // State for sorting order
+  const [sortOrder, setSortOrder] = useState('asc');
+
+
 // Snackbar Notifications -----------------------
 // These functions handle showing snackbar notifications
 const showSuccessSnackbar = (message) => {
@@ -124,63 +131,138 @@ const handleRemoveVariant = (index) => {
   const filteredVariants = inventory.variants.filter((_, i) => i !== index);
   setInventory({ ...inventory, variants: filteredVariants });
 };
-  
+
+// Function to handle search query change
+const handleSearchChange = (event) => {
+  setSearchQuery(event.target.value);
+};
+
+// Filtered products based on search query
+const filteredProducts = products.filter((product) => {
+  // Check if any variant matches the search query
+  return product.variants.some((variant) => {
+    const searchTerm = searchQuery.toLowerCase();
+    return (
+      (variant.id && variant.id.toString().toLowerCase().includes(searchTerm)) ||
+      (variant.name && variant.name.toLowerCase().includes(searchTerm)) ||
+      (variant.color && variant.color.toLowerCase().includes(searchTerm)) ||
+      (variant.size && variant.size.toLowerCase().includes(searchTerm)) ||
+      (variant.quantity && variant.quantity.toString().toLowerCase().includes(searchTerm))
+    );
+  });
+});
+
+
+const sortProductsByQuantity = (order) => {
+  return [...filteredProducts].sort((a, b) => {
+    // Calculate total quantity for each product
+    const totalQuantityA = a.variants.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
+    const totalQuantityB = b.variants.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
+
+    // Compare total quantities based on the sort order
+    if (order === 'asc') {
+      return totalQuantityA - totalQuantityB;
+    } else {
+      return totalQuantityB - totalQuantityA;
+    }
+  });
+};
+
+// Function to handle sort change
+const handleSortChange = (event) => {
+  const newSortOrder = event.target.value;
+  setSortOrder(newSortOrder);
+
+  // Sort the products based on the new sort order
+  const sortedProducts = sortProductsByQuantity(newSortOrder);
+  setProducts(sortedProducts); // Update 'products' state instead of 'filteredProducts'
+};
+
   return (
     <Container maxWidth="lg">
-      <Box sx={{ display: "flex" }}>
-        <Sidebar />
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <Typography variant="h4" gutterBottom align="center">
-            Inventory
-          </Typography>
+    <Box sx={{ display: "flex" }}>
+      <Sidebar />
+    
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+  <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    {/* Search bar */}
+    <TextField
+      label="Search"
+      variant="outlined"
+      fullWidth
+      size="small"
+      value={searchQuery}
+      onChange={handleSearchChange}
+      sx={{ width: '50%' }} // Adjust width as needed
+    />
 
-  
+    {/* Sort options */}
+    <FormControl sx={{ minWidth: 100, marginLeft: 2 }}>
+      <InputLabel id="sort-label" sx={{ fontSize: '0.9rem' }}>Sort</InputLabel>
+      <Select
+        labelId="sort-label"
+        value={sortOrder}
+        onChange={handleSortChange}
+        label="Sort"
+        size="small"
+        sx={{ fontSize: '0.9rem' }}
+      >
+        <MenuItem value="asc">Asc</MenuItem>
+        <MenuItem value="desc">Desc</MenuItem>
+      </Select>
+    </FormControl>
+  </Box>
+        
+        {/* Display products or message */}
+        {filteredProducts.length > 0 ? (
           <TableContainer component={Paper}>
-  <Table sx={{ width: '100%' }} aria-label="customized table">
+            {/* Table code... */}
+          </TableContainer>
+        ) : (
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Nothing matches the search
+          </Typography>
+        )}
+
+          <TableContainer component={Paper}>
+  <Table sx={{ minWidth: 650 }} aria-label="customized table">
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-        </TableCell>
-        <TableCell style={{ width: '15%' }}>Product ID</TableCell>
-        <TableCell style={{ width: '15%' }}>Name</TableCell>
-        <TableCell style={{ width: '10%' }}>Colors</TableCell>
-        <TableCell style={{ width: '10%' }}>Sizes</TableCell>
-        <TableCell>Actions</TableCell>
+        <TableCell align="center">Product ID</TableCell>
+        <TableCell align="center">Name</TableCell>
+        <TableCell align="center">Color</TableCell>
+        <TableCell align="center">Size</TableCell>
+        <TableCell align="center">Quantity</TableCell>
+        <TableCell align="center">Actions</TableCell>
       </TableRow>
     </TableHead>
     <TableBody>
-      {products.map((product) => (
-        <TableRow
-          key={product.id}        >
-          <TableCell padding="checkbox">
-          </TableCell>
-          <TableCell>{product.id}</TableCell>
-          <TableCell>{product.name}</TableCell>
-          <TableCell>
-            {product.variants
-              .map((variant) => variant.color)
-              .join(", ")}
-          </TableCell>
-          <TableCell>
-            {product.variants.map((variant) => variant.size).join(", ")}
-          </TableCell>
-          <TableCell>
-            <IconButton
-              color="primary"
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              color="secondary"
-            >
-              <DeleteIcon />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
+  {filteredProducts.map((product) => (
+    product.variants.map((variant, index) => (
+      <TableRow key={`${product.id}-${variant.color}-${variant.size}`}>
+        <TableCell align="center" style={{ padding: '6px 12px' }}>{product.id}</TableCell>
+        <TableCell align="center" style={{ padding: '6px 12px' }}>{product.name}</TableCell>
+        <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.color}</TableCell>
+        <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.size}</TableCell>
+        <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.quantity}</TableCell>
+        <TableCell align="center" style={{ padding: '6px 12px' }}>
+          <IconButton color="primary">
+            <EditIcon />
+          </IconButton>
+          <IconButton color="secondary">
+            <DeleteIcon />
+          </IconButton>
+        </TableCell>
+      </TableRow>
+    ))
+  ))}
+</TableBody>
+
   </Table>
 </TableContainer>
+
+
+
         </Box>
       </Box>
     </Container>

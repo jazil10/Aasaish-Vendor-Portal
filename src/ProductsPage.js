@@ -63,6 +63,7 @@ function ProductsPage() {
 
   // State for new product details
   const [newProduct, setNewProduct] = useState({
+    _id: '',
     brandId: '',
     name: '',
     description: '',
@@ -158,6 +159,7 @@ const handleOpenForAdd = () => {
   setOpen(true);
   setIsEditing(false);
   setNewProduct({
+    productCode: '', // Add field for product code
     brandId: currentVendor.brand,
     name: '',
     description: '',
@@ -168,6 +170,7 @@ const handleOpenForAdd = () => {
   });
   handleMenuClose();
 };
+
 
 const handleClose = () => {
   setOpen(false);
@@ -787,6 +790,16 @@ const isIndeterminate = selectedProducts.size > 0 && selectedProducts.size < pro
               <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
                 {isEditing ? "Edit Product" : "Add New Product"}
               </Typography>
+              <TextField
+  margin="normal"
+  fullWidth
+  label="Product Code"
+  name="productCode"
+  value={newProduct._id}
+  onChange={handleChange}
+  required
+/>
+
               <TextField
                 margin="normal"
                 fullWidth

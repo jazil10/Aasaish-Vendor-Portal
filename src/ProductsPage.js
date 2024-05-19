@@ -162,18 +162,18 @@ const handleOpenForAdd = () => {
   setOpen(true);
   setIsEditing(false);
   setNewProduct({
-    productCode: '', // Add field for product code
+    _id: '',  // Clear or prepare for new entry
     brandId: currentVendor.brand,
     name: '',
     description: '',
     category: '',
+    tags: [],
     price: '',
-    images: '', 
+    images: [],
     offers: '',
   });
   handleMenuClose();
 };
-
 
 const handleClose = () => {
   setOpen(false);
@@ -708,6 +708,7 @@ const isIndeterminate = selectedProducts.size > 0 && selectedProducts.size < pro
                 <Grid container spacing={2}>
                   {/* Mapping for basic product fields */}
                   {[
+                    "productid",
                     "name",
                     "description",
                     "category",
@@ -784,65 +785,63 @@ const isIndeterminate = selectedProducts.size > 0 && selectedProducts.size < pro
           </Modal>
   
           <Modal open={open} onClose={handleClose}>
-            <Box
-              sx={modalStyle}
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-            >
-              <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-                {isEditing ? "Edit Product" : "Add New Product"}
-              </Typography>
-              <TextField
-  margin="normal"
-  fullWidth
-  label="Product Code"
-  name="productCode"
-  value={newProduct._id}
-  onChange={handleChange}
-  required
-/>
-
-              <TextField
-                margin="normal"
-                fullWidth
-                label="Name"
-                name="name"
-                value={newProduct.name}
-                onChange={handleChange}
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                label="Description"
-                name="description"
-                value={newProduct.description}
-                onChange={handleChange}
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                label="Price"
-                type="number"
-                name="price"
-                value={newProduct.price}
-                onChange={handleChange}
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                label="Image URL"
-                name="images"
-                value={newProduct.images}
-                onChange={handleChange}
-              />
-              <input
-                accept="image/*"
-                type="file"
-                multiple
-                onChange={handleImageChange}
-                style={{ margin: "10px 0" }}
-              />
+    <Box
+      sx={modalStyle}
+      component="form"
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      {!isEditing && ( // Only show ID field when not editing an existing product
+        <TextField
+          margin="normal"
+          fullWidth
+          label="Product ID"
+          name="_id"
+          value={newProduct._id}
+          onChange={handleChange}
+          helperText="Enter a unique ID for the product"
+        />
+      )}
+      <TextField
+        margin="normal"
+        fullWidth
+        label="Name"
+        name="name"
+        value={newProduct.name}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        label="Description"
+        name="description"
+        value={newProduct.description}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        label="Price"
+        type="number"
+        name="price"
+        value={newProduct.price}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        label="Image URL"
+        name="images"
+        value={newProduct.images}
+        onChange={handleChange}
+      />
+      <input
+        accept="image/*"
+        type="file"
+        multiple
+        onChange={handleImageChange}
+        style={{ margin: "10px 0" }}
+      />
               <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
                 <InputLabel id="collection-label">Collection</InputLabel>
                 <Select

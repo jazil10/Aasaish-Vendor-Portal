@@ -1,93 +1,62 @@
-.products-container {
-  padding: 20px;
-  margin-left: 240px; /* Adjust if the sidebar is dynamic */
-  width: auto; /* Ensures it takes the available space */
-  overflow-x: auto; /* Allows for horizontal scrolling if table overflows */
-}
-
-.product-form {
-  margin-bottom: 20px;
-}
-
-.product-form input, .product-form textarea, .product-form select {
-  display: block;
-  margin-bottom: 10px;
+.table-container {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  margin: 20px 0;
 }
 
-.product-item {
-  border: 1px solid #ddd;
-  padding: 15px;
-  margin-bottom: 15px;
-  background-color: #fff;
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.product-item img {
-  width: auto; /* Keep the image's aspect ratio */
-  height: 150px; /* Set a fixed height */
-  display: block;
-  object-fit: contain; /* Ensures the image fits well within the dimensions */
-}
-
-/* Table Styles */
-.TableContainer {
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.TableHead {
+.custom-table thead {
   background-color: #f5f5f5;
 }
 
-.TableRow {
-  transition: background-color 0.3s ease;
-}
-
-.TableRow:hover {
-  background-color: #eaeaea;
-}
-
-.TableCell {
-  padding: 16px;
-  border-bottom: 1px solid #ddd;
+.custom-table th, .custom-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
   text-align: left;
 }
 
-/* Buttons */
-.Button {
-  border: none;
-  padding: 10px 20px;
-  margin: 0 5px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.custom-table th {
+  font-weight: bold;
 }
 
-.Button-primary {
-  background-color: #0056b3;
-  color: white;
+.custom-table td img {
+  max-width: 150px; /* Increased size */
+  max-height: 150px; /* Increased size */
+  object-fit: cover;
 }
 
-.Button-secondary {
-  background-color: #e53935;
-  color: white;
+.custom-table tbody tr:hover {
+  background-color: #f1f1f1;
 }
 
-.Button:hover {
-  opacity: 0.8;
+.custom-table .action-buttons {
+  display: flex;
+  gap: 10px;
 }
 
-/* Responsiveness */
-@media screen and (max-width: 768px) {
-  .products-container {
-    margin-left: 0;
-    padding: 10px;
-  }
+.custom-table .edit-button {
+  color: #1976d2;
+}
 
-  .product-item, .product-form input, .product-form textarea, .product-form select {
-    width: 100%;
-  }
+.custom-table .delete-button {
+  color: #d32f2f;
+}
+
+.custom-table .checkbox-cell {
+  text-align: center;
+}
+
+img.product-image {
+  width: 150px;  /* Increase the width for larger images */
+  height: auto;  /* Maintain aspect ratio */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.table-cell-image {
+  text-align: center;
 }

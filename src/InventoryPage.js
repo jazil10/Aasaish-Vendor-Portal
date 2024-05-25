@@ -1,272 +1,294 @@
-import React, { useState, useEffect } from 'react';
-
-// Importing Axios for HTTP requests
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-
-// Importing Material-UI components
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  FormControlLabel, Paper, Typography, IconButton, Button, Modal, Box,
-  Checkbox, TextField, Container, Select, Menu, MenuItem, InputLabel,
-  FormControl, Chip, OutlinedInput, Grid, List, ListItem, ListItemText
+  Paper, Typography, IconButton, TextField, Container, Select, MenuItem,
+  FormControl, InputLabel, Box, CircularProgress, TablePagination, Checkbox, FormControlLabel,
+  Button, Popover
 } from '@mui/material';
-
-// Importing Firebase storage functions
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from './firebase'; 
-
-// Importing custom components and icons
-import Sidebar from './Sidebar';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import AddIcon from '@mui/icons-material/Add';
-
-// Importing Snackbar for notifications
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import Sidebar from './Sidebar';
 import { BASE_URL } from './config';
+import { io } from 'socket.io-client';
 
-function InventoryPage() {
-  // Snackbar for user notifications
-  const { enqueueSnackbar } = useSnackbar(); 
+// Real-time updates with WebSockets
+const socket = io(BASE_URL);
 
-  // State for managing product data
+const InventoryPage = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const [products, setProducts] = useState([]);
-
-  // State for inventory details
-  const [inventory, setInventory] = useState({
-    storeId: '',
-    variants: [{ color: '', size: '', quantity: '' }],
-    offers: { discountPercentage: '', description: '', validUntil: '' }
-  });
-
-  // State for vendor details
-  const [currentVendor, setCurrentVendor] = useState({
-    name: '',
-    brand: '',
-    store: '',
-  });
-
-  // State for editing controls
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState({});
-
-    // State for search query
-    const [searchQuery, setSearchQuery] = useState('');
-
-  // State for sorting order
+  const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
-
-
-// Snackbar Notifications -----------------------
-// These functions handle showing snackbar notifications
-const showSuccessSnackbar = (message) => {
-  enqueueSnackbar(message, { variant: 'success', anchorOrigin: {
-    vertical: 'top',
-    horizontal: 'right',
-  }, autoHideDuration: 1000 }); // Notification appears for 1 second
-};
-
-// API Initialization -----------------------
-// Setup common API configurations and fetch initial data
-useEffect(() => {
-  const token = localStorage.getItem('token');
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  
-  fetchVendorDetails();
-  fetchProducts();
-}, []);
-
-// Vendor Details -----------------------
-// Functions related to fetching and setting vendor details
-const fetchVendorDetails = async () => {
-  try {
-    const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
-    const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;
-
-    console.log("brand:" + vendorDetails.brand._id); // Log brand ID
-    console.log("store:" + storeId); // Log store ID
-
-    // Set the brand and store in the currentVendor state
-    setCurrentVendor(prevState => ({
-      ...prevState,
-      brand: vendorDetails.brand._id,
-      store: storeId,
-    }));
-  } catch (error) {
-    console.error('Error fetching vendor details:', error);
-  }
-};
-
-// Product Management -----------------------
-// Functions to handle CRUD operations on products
-const fetchProducts = async () => {
-  try {
-    const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
-    const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;    // Replace this with actual store ID retrieval logic
-    const response = await axios.get(`${BASE_URL}/Product/by-store/${storeId}`);
-    setProducts(response.data);
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
-  }
-};
-
-// Inventory Variants -----------------------
-// Functions to handle inventory variants
-const handleVariantChange = (index, event) => {
-  const updatedVariants = inventory.variants.map((variant, i) =>
-    i === index ? { ...variant, [event.target.name]: event.target.value } : variant
-  );
-  setInventory({ ...inventory, variants: updatedVariants });
-};
-
-const handleAddVariant = () => {
-  setInventory({
-    ...inventory,
-    variants: [...inventory.variants, { color: '', size: '', quantity: '' }],
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [lowStockThreshold, setLowStockThreshold] = useState(10);
+  const [stockFilters, setStockFilters] = useState({
+    outOfStock: true,
+    inventoryLow: true,
+    inStock: true
   });
-};
+  const [anchorEl, setAnchorEl] = useState(null);
 
-const handleRemoveVariant = (index) => {
-  const filteredVariants = inventory.variants.filter((_, i) => i !== index);
-  setInventory({ ...inventory, variants: filteredVariants });
-};
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    fetchVendorDetails();
+    fetchProducts();
 
-// Function to handle search query change
-const handleSearchChange = (event) => {
-  setSearchQuery(event.target.value);
-};
+    // Real-time updates
+    socket.on('inventory-update', (updatedInventory) => {
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === updatedInventory.productId ? updatedInventory : product
+        )
+      );
+    });
 
-// Filtered products based on search query
-const filteredProducts = products.filter((product) => {
-  // Check if any variant matches the search query
-  return product.variants.some((variant) => {
-    const searchTerm = searchQuery.toLowerCase();
-    return (
-      (variant.id && variant.id.toString().toLowerCase().includes(searchTerm)) ||
-      (variant.name && variant.name.toLowerCase().includes(searchTerm)) ||
-      (variant.color && variant.color.toLowerCase().includes(searchTerm)) ||
-      (variant.size && variant.size.toLowerCase().includes(searchTerm)) ||
-      (variant.quantity && variant.quantity.toString().toLowerCase().includes(searchTerm))
-    );
-  });
-});
+    return () => {
+      socket.off('inventory-update');
+    };
+  }, []);
 
-
-const sortProductsByQuantity = (order) => {
-  return [...filteredProducts].sort((a, b) => {
-    // Calculate total quantity for each product
-    const totalQuantityA = a.variants.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
-    const totalQuantityB = b.variants.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
-
-    // Compare total quantities based on the sort order
-    if (order === 'asc') {
-      return totalQuantityA - totalQuantityB;
-    } else {
-      return totalQuantityB - totalQuantityA;
+  const fetchVendorDetails = async () => {
+    try {
+      const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
+      // Handle vendor details logic
+    } catch (error) {
+      console.error('Error fetching vendor details:', error);
     }
+  };
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
+      const storeId = vendorDetails.stores.length > 0 ? vendorDetails.stores[0]._id : null;
+      const response = await axios.get(`${BASE_URL}/Product/inventory-by-store/${storeId}`);
+      setProducts(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+      setLoading(false);
+    }
+  }, []);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSortChange = (event) => {
+    const newSortOrder = event.target.value;
+    setSortOrder(newSortOrder);
+  };
+
+  const handleStockFilterChange = (event) => {
+    setStockFilters({
+      ...stockFilters,
+      [event.target.name]: event.target.checked
+    });
+  };
+
+  const getStockStatus = (quantity) => {
+    if (quantity === 0) return 'Out of Stock';
+    if (quantity < lowStockThreshold) return 'Inventory Low';
+    return 'In Stock';
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const searchTerm = searchQuery.toLowerCase();
+    return product.variants.some((variant) => {
+      const stockStatus = getStockStatus(variant.quantity).toLowerCase();
+      return (
+        (product.productCode && product.productCode.toLowerCase().includes(searchTerm)) ||
+        (product.name && product.name.toLowerCase().includes(searchTerm)) ||
+        (variant.color && variant.color.toLowerCase().includes(searchTerm)) ||
+        (variant.size && variant.size.toLowerCase().includes(searchTerm)) ||
+        (variant.quantity && variant.quantity.toString().toLowerCase().includes(searchTerm)) ||
+        stockStatus.includes(searchTerm)
+      );
+    });
+  }).filter((product) => {
+    return product.variants.some((variant) => {
+      const stockStatus = getStockStatus(variant.quantity);
+      return (
+        (stockStatus === 'Out of Stock' && stockFilters.outOfStock) ||
+        (stockStatus === 'Inventory Low' && stockFilters.inventoryLow) ||
+        (stockStatus === 'In Stock' && stockFilters.inStock)
+      );
+    });
   });
-};
 
-// Function to handle sort change
-const handleSortChange = (event) => {
-  const newSortOrder = event.target.value;
-  setSortOrder(newSortOrder);
+  const sortProductsByQuantity = (products, order) => {
+    return [...products].sort((a, b) => {
+      const totalQuantityA = a.variants.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
+      const totalQuantityB = b.variants.reduce((acc, curr) => acc + parseInt(curr.quantity), 0);
+      return order === 'asc' ? totalQuantityA - totalQuantityB : totalQuantityB - totalQuantityA;
+    });
+  };
 
-  // Sort the products based on the new sort order
-  const sortedProducts = sortProductsByQuantity(newSortOrder);
-  setProducts(sortedProducts); // Update 'products' state instead of 'filteredProducts'
-};
+  const sortedProducts = sortProductsByQuantity(filteredProducts, sortOrder);
+
+  const paginatedProducts = sortedProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+  const handleFilterButtonClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleFilterClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'filter-popover' : undefined;
 
   return (
     <Container maxWidth="lg">
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-    
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-  <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-    {/* Search bar */}
-    <TextField
-      label="Search"
-      variant="outlined"
-      fullWidth
-      size="small"
-      value={searchQuery}
-      onChange={handleSearchChange}
-      sx={{ width: '50%' }} // Adjust width as needed
-    />
-
-    {/* Sort options */}
-    <FormControl sx={{ minWidth: 100, marginLeft: 2 }}>
-      <InputLabel id="sort-label" sx={{ fontSize: '0.9rem' }}>Sort</InputLabel>
-      <Select
-        labelId="sort-label"
-        value={sortOrder}
-        onChange={handleSortChange}
-        label="Sort"
-        size="small"
-        sx={{ fontSize: '0.9rem' }}
-      >
-        <MenuItem value="asc">Asc</MenuItem>
-        <MenuItem value="desc">Desc</MenuItem>
-      </Select>
-    </FormControl>
-  </Box>
-        
-        {/* Display products or message */}
-        {filteredProducts.length > 0 ? (
-          <TableContainer component={Paper}>
-            {/* Table code... */}
-          </TableContainer>
-        ) : (
-          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-            Nothing matches the search
-          </Typography>
-        )}
-
-          <TableContainer component={Paper}>
-  <Table sx={{ minWidth: 650 }} aria-label="customized table">
-    <TableHead>
-      <TableRow>
-        <TableCell align="center">Product ID</TableCell>
-        <TableCell align="center">Name</TableCell>
-        <TableCell align="center">Color</TableCell>
-        <TableCell align="center">Size</TableCell>
-        <TableCell align="center">Quantity</TableCell>
-        <TableCell align="center">Actions</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-  {filteredProducts.map((product) => (
-    product.variants.map((variant, index) => (
-      <TableRow key={`${product.id}-${variant.color}-${variant.size}`}>
-        <TableCell align="center" style={{ padding: '6px 12px' }}>{product.id}</TableCell>
-        <TableCell align="center" style={{ padding: '6px 12px' }}>{product.name}</TableCell>
-        <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.color}</TableCell>
-        <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.size}</TableCell>
-        <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.quantity}</TableCell>
-        <TableCell align="center" style={{ padding: '6px 12px' }}>
-          <IconButton color="primary">
-            <EditIcon />
-          </IconButton>
-          <IconButton color="secondary">
-            <DeleteIcon />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-    ))
-  ))}
-</TableBody>
-
-  </Table>
-</TableContainer>
-
-
-
+      <Box sx={{ display: 'flex' }}>
+        <Sidebar />
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <TextField
+              label="Search"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              sx={{ width: '50%' }}
+            />
+            <Button variant="contained" onClick={handleFilterButtonClick}>
+              Filters
+            </Button>
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleFilterClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <Box sx={{ p: 2, minWidth: 250 }}>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel id="sort-label">Sort</InputLabel>
+                  <Select
+                    labelId="sort-label"
+                    value={sortOrder}
+                    onChange={handleSortChange}
+                    label="Sort"
+                    size="small"
+                  >
+                    <MenuItem value="asc">Asc</MenuItem>
+                    <MenuItem value="desc">Desc</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Low Stock Threshold"
+                  variant="outlined"
+                  type="number"
+                  size="small"
+                  fullWidth
+                  value={lowStockThreshold}
+                  onChange={(e) => setLowStockThreshold(parseInt(e.target.value, 10))}
+                  sx={{ mb: 2 }}
+                />
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>Stock Status</Typography>
+                <FormControlLabel
+                  control={<Checkbox checked={stockFilters.outOfStock} onChange={handleStockFilterChange} name="outOfStock" />}
+                  label="Out of Stock"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={stockFilters.inventoryLow} onChange={handleStockFilterChange} name="inventoryLow" />}
+                  label="Inventory Low"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={stockFilters.inStock} onChange={handleStockFilterChange} name="inStock" />}
+                  label="In Stock"
+                />
+                <Button variant="contained" onClick={handleFilterClose} sx={{ mt: 2 }}>
+                  Done
+                </Button>
+              </Box>
+            </Popover>
+          </Box>
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+              <CircularProgress />
+            </Box>
+          ) : filteredProducts.length > 0 ? (
+            <>
+              <TableContainer component={Paper} className="table-container">
+                <Table className="custom-table" aria-label="customized table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Product Code</TableCell>
+                      <TableCell align="center">Name</TableCell>
+                      <TableCell align="center">Color</TableCell>
+                      <TableCell align="center">Size</TableCell>
+                      <TableCell align="center">Quantity</TableCell>
+                      <TableCell align="center">Stock</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedProducts.map((product) =>
+                      product.variants.map((variant) => (
+                        <TableRow key={`${product.id}-${variant.color}-${variant.size}`}>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>{product.productCode}</TableCell>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>{product.name}</TableCell>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.color}</TableCell>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.size}</TableCell>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>{variant.quantity}</TableCell>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>{getStockStatus(variant.quantity)}</TableCell>
+                          <TableCell align="center" style={{ padding: '6px 12px' }}>
+                            <IconButton color="primary">
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton color="secondary">
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                component="div"
+                count={filteredProducts.length}
+                page={page}
+                onPageChange={handlePageChange}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowsPerPageOptions={[10, 20, 30]}  // Options for rows per page
+              />
+            </>
+          ) : (
+            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+              Nothing matches the search
+            </Typography>
+          )}
         </Box>
       </Box>
     </Container>
   );
 };
-  export default InventoryPage;
+
+export default InventoryPage;
+

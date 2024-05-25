@@ -7,36 +7,41 @@ import InventoryPage from './InventoryPage';
 import TagsPage from './TagsPage';
 import CategoriesPage from './CategoryPage';
 import { SnackbarProvider } from 'notistack';
-
 import CollectionsPage from './CollectionsPage';
-import SalesPerformanceChart from './Analytics';
 import AnalyticsPage from './Analytics';
-
-// Import other components
+import OrdersPage from './OrdersPage';
+import VendorPage from './VendorPage';
+import TopBar from './TopBar';
+import SettingsPage from './SettingsPage'; // Import the SettingsPage component
+import ReservationsPage from './ReservationsPage';
+import { Box } from '@mui/material';
 
 function App() {
   return (
     <SnackbarProvider maxSnack={3}>
-    <Router>
-      <div className="App">
-        
-        <Routes>
-          {/* <Route path="/products" element={<ProductsPage />} /> */}
-          <Route path="/login" element = {<LoginPage/>}/>
-          <Route path="/stores" element = {<StoresPage/>}/>
-          <Route path="/product" element = {<ProductsPage/>}/>
-          <Route path="/inventory" element = {<InventoryPage/>}/>
-          <Route path="/tag" element = {<TagsPage/>}/>
-          <Route path= "/category" element = {<CategoriesPage/>}/>
-          <Route path= "/collection" element = {<CollectionsPage/>}/>
-          <Route path= "/analytics" element = {<AnalyticsPage/>}/>
+      <Router>
+        <TopBar />
+        <Box sx={{ display: 'flex', mt: 8 }}>
+          <Routes>
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/stores" element={<StoresPage />} />
+            <Route path="/product" element={<ProductsPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
+            <Route path="/tag" element={<TagsPage />} />
+            <Route path="/category" element={<CategoriesPage />} />
+            <Route path="/collection" element={<CollectionsPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/reservations" element={<ReservationsPage />} />
 
-          {/* Define other routes */}
-        </Routes>
-      </div>
-    </Router>
+            <Route path="/vendor" element={<VendorPage />} />
+            <Route path="/settings" element={<SettingsPage />} /> {/* Add the settings route */}
+            {/* Define other routes */}
+          </Routes>
+        </Box>
+      </Router>
     </SnackbarProvider>
-
   );
 }
 

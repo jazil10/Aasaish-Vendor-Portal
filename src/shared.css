@@ -1,0 +1,65 @@
+/* shared.css */
+
+.table-container {
+    width: 100%;
+    margin: 20px 0;
+  }
+  
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .custom-table thead {
+    background-color: #f5f5f5;
+  }
+  
+  .custom-table th, .custom-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .custom-table th {
+    font-weight: bold;
+  }
+  
+  .custom-table td img {
+    max-width: 150px; /* Increased size */
+    max-height: 150px; /* Increased size */
+    object-fit: cover;
+  }
+  
+  .custom-table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .custom-table .action-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .custom-table .edit-button {
+    color: #1976d2;
+  }
+  
+  .custom-table .delete-button {
+    color: #d32f2f;
+  }
+  
+  .custom-table .checkbox-cell {
+    text-align: center;
+  }
+  
+  img.product-image {
+    width: 150px;  /* Increase the width for larger images */
+    height: auto;  /* Maintain aspect ratio */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .table-cell-image {
+    text-align: center;
+  }
+  

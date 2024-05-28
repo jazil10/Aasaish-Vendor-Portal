@@ -6,6 +6,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Sidebar from './Sidebar';
 import { blue, pink } from '@mui/material/colors';
@@ -18,6 +19,22 @@ const theme = createTheme({
     },
     secondary: {
       main: pink['A400'],
+    },
+  },
+  typography: {
+    fontFamily: 'Poppins, sans-serif',
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 500,
+    },
+    body1: {
+      fontSize: '1.1rem',
+    },
+    body2: {
+      fontSize: '1rem',
+      color: 'text.secondary',
     },
   },
 });
@@ -41,6 +58,14 @@ const modalStyle = {
   overflowY: 'auto',
   maxHeight: '90vh',
 };
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.6/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.6/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.6/dist/images/marker-shadow.png',
+});
 
 const StoresPage = () => {
   const [store, setStore] = useState(null);
@@ -79,7 +104,7 @@ const StoresPage = () => {
         const { data: vendorDetails } = await axios.get(`${BASE_URL}/User/vendorbyid`);
         setCurrentStore(prevState => ({
           ...prevState,
-          brand: vendorDetails.brand._id,
+          brand: vendorDetails.brand.name,
         }));
       } catch (error) {
         console.error('Error fetching vendor details:', error);
@@ -182,7 +207,7 @@ const StoresPage = () => {
           <Sidebar />
           <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <Typography variant="h4" gutterBottom align="center" color="primary.main">
-              Store Location
+              {currentStore.brand}
             </Typography>
             {loading ? (
               <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -200,7 +225,7 @@ const StoresPage = () => {
                   <Typography variant="body2" color="text.secondary">
                     Contact Info: {store.contactInfo}
                   </Typography>
-                  <MapContainer center={[store.location.coordinates[1], store.location.coordinates[0]]} zoom={13} style={mapContainerStyle} scrollWheelZoom={false}>
+                  <MapContainer center={[store.location.coordinates[1], store.location.coordinates[0]]} zoom={10} style={mapContainerStyle} scrollWheelZoom={false}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     <Marker position={[store.location.coordinates[1], store.location.coordinates[0]]}>
                       <Popup>Store Location</Popup>
@@ -247,7 +272,7 @@ const StoresPage = () => {
                     </List>
                   </Paper>
                 </Box>
-                <MapContainer center={[currentStore.location.lat, currentStore.location.lng]} zoom={13} style={mapContainerStyle} scrollWheelZoom={false} onClick={handleMapClick}>
+                <MapContainer center={[currentStore.location.lat, currentStore.location.lng]} zoom={10} style={mapContainerStyle} scrollWheelZoom={false} onClick={handleMapClick}>
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   <Marker position={[currentStore.location.lat, currentStore.location.lng]}>
                     <Popup>Store Location</Popup>

@@ -1,45 +1,84 @@
+/* Container for the table */
+.inventory-table-container {
+  width: 100%;
+  margin: 20px 0;
+}
 
-.table-container {
-    width: 100%;
-    margin: 20px 0;
-  }
-  
-  .custom-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .custom-table thead {
-    background-color: #f5f5f5;
-  }
-  
-  .custom-table th, .custom-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-  
-  .custom-table th {
-    font-weight: bold;
-  }
-  
-  .custom-table td img {
-    max-width: 150px; /* Increased size */
-    max-height: 150px; /* Increased size */
-    object-fit: cover;
-  }
-  
-  .custom-table tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .custom-table .action-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .custom-table .edit-button {
-    color: #1976d2;
-  }
-  
-  
+/* Custom table styling */
+.inventory-custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header styling */
+.inventory-custom-table thead {
+  background-color: #f5f5f5;
+}
+
+/* Table cell styling */
+.inventory-custom-table th, .inventory-custom-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.inventory-custom-table th {
+  font-weight: bold;
+}
+
+/* Image styling */
+.inventory-custom-table td img {
+  max-width: 150px;
+  max-height: 150px;
+  object-fit: cover;
+}
+
+/* Row hover effect */
+.inventory-custom-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Action buttons container */
+.inventory-custom-table .action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Edit button styling */
+.inventory-custom-table .edit-button {
+  color: #1976d2;
+}
+
+/* Delete button styling */
+.inventory-custom-table .delete-button {
+  color: #d32f2f;
+}
+
+/* Custom button styling */
+.inventory-custom-button {
+  min-width: 150px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Heading styling */
+.inventory-heading {
+  font-family: 'Poppins, sans-serif';
+  font-weight: 600;
+  color: #1e90ff;
+}
+
+/* Main content styling */
+.inventory-main-content {
+  flex-grow: 1;
+  padding: 24px;
+  margin-left: 240px; /* Increase margin for better appearance */
+  width: calc(100% - 240px); /* Adjust width calculation */
+}
+
+/* Add space between buttons in the button container */
+.button-container button {
+  margin-left: 8px; /* Adjust the value as needed for the desired spacing */
+}

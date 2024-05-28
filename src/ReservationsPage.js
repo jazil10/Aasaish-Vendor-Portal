@@ -3,7 +3,7 @@ import axios from 'axios';
 import './ReservationsPage.css';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Typography, IconButton, Box, Container, CircularProgress, TablePagination, Tooltip, TextField, FormControl, InputLabel, Select, MenuItem
+  Paper, Typography, IconButton, Box, Container, CircularProgress, TablePagination, Tooltip, TextField, FormControl, InputLabel, Select, MenuItem, Chip
 } from '@mui/material';
 import Sidebar from './Sidebar';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -73,6 +73,29 @@ function ReservationsPage() {
     setFilterStatus(event.target.value);
   };
 
+  const getTagStyle = (status) => {
+    switch (status) {
+      case 'Active':
+        return { borderColor: '#388e3c', color: '#388e3c' }; // Bright Green
+      case 'Expired':
+        return { borderColor: '#d32f2f', color: '#d32f2f' }; // Bright Red
+      case 'Cancelled by Vendor':
+      case 'Cancelled by Customer':
+        return { borderColor: '#f57c00', color: '#f57c00' }; // Bright Orange
+      case 'Completed':
+        return { borderColor: '#0288d1', color: '#0288d1' }; // Bright Blue
+      default:
+        return { borderColor: '#757575', color: '#757575' }; // Bright Grey
+    }
+  };
+
+  const calculateHoursUntilExpiration = (expiresAt) => {
+    const now = new Date();
+    const expirationDate = new Date(expiresAt);
+    const differenceInMilliseconds = expirationDate - now;
+    return Math.max(0, Math.floor(differenceInMilliseconds / (1000 * 60 * 60)));
+  };
+
   const filteredReservations = reservations.filter((reservation) => {
     return reservation.items.some((item) => {
       const matchesSearchQuery = 
@@ -92,12 +115,12 @@ function ReservationsPage() {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", ml: -7 }}> {/* Move layout towards left */}
         <Sidebar />
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <Typography variant="h4" gutterBottom align="center">
-            Vendor Reservations
-          </Typography>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }} className="reservation-main-content">
+        <Typography variant="h4" gutterBottom align="center" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, color: '#1e90ff' }}>
+Reservations 
+</Typography>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <TextField
               label="Search"
@@ -129,16 +152,17 @@ function ReservationsPage() {
             </Box>
           ) : (
             <>
-              <TableContainer component={Paper} className="table-container">
-                <Table className="custom-table" aria-label="customized table">
+              <TableContainer component={Paper} className="reservation-table-container">
+                <Table className="reservation-custom-table" aria-label="customized table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Reservation ID</TableCell>
-                      <TableCell>Product Code</TableCell>
-                      <TableCell>Product Name</TableCell>
-                      <TableCell>Variant</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Actions</TableCell>
+                      <TableCell align="center">Reservation ID</TableCell>
+                      <TableCell align="center">Product Code</TableCell>
+                      <TableCell align="center">Product Name</TableCell>
+                      <TableCell align="center">Variant</TableCell>
+                      <TableCell align="center">Expires In</TableCell>
+                      <TableCell align="center">Status</TableCell>
+                      <TableCell align="center">Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -163,16 +187,26 @@ function ReservationsPage() {
 
                         return (
                           <TableRow key={item._id}>
-                            <TableCell>{reservation._id}</TableCell>
-                            <TableCell>{item.productId ? item.productId.productCode : 'N/A'}</TableCell>
-                            <TableCell>{item.productId ? item.productId.name : 'N/A'}</TableCell>
-                            <TableCell>{`Color: ${item.variant.color}, Size: ${item.variant.size}`}</TableCell>
-                            <TableCell>{item.status}</TableCell>
-                            <TableCell className="action-buttons">
+                            <TableCell align="center">{reservation._id}</TableCell>
+                            <TableCell align="center">{item.productId ? item.productId.productCode : 'N/A'}</TableCell>
+                            <TableCell align="center">{item.productId ? item.productId.name : 'N/A'}</TableCell>
+                            <TableCell align="center">{`Color: ${item.variant.color}, Size: ${item.variant.size}`}</TableCell>
+                            <TableCell align="center">{calculateHoursUntilExpiration(item.expiresAt)} hours</TableCell>
+                            <TableCell align="center">
+                              <Chip
+                                label={item.status}
+                                style={{
+                                  border: `1px solid ${getTagStyle(item.status).borderColor}`,
+                                  color: getTagStyle(item.status).color,
+                                  backgroundColor: 'transparent'
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="center" className="reservation-action-buttons">
                               <Tooltip title={tooltipMessage} disableHoverListener={!isDisabled}>
                                 <span>
                                   <IconButton
-                                    className="cancel-button"
+                                    className="reservation-cancel-button"
                                     onClick={() => handleDeleteReservation(reservation._id, item._id)}
                                     disabled={isDisabled}
                                     style={{ color: isDisabled ? 'grey' : 'red' }}
@@ -184,7 +218,7 @@ function ReservationsPage() {
                               <Tooltip title={tooltipMessage} disableHoverListener={!isDisabled}>
                                 <span>
                                   <IconButton
-                                    className="complete-button"
+                                    className="reservation-complete-button"
                                     onClick={() => handleCompleteReservation(reservation._id, item._id)}
                                     disabled={isDisabled}
                                     style={{ color: isDisabled ? 'grey' : 'green' }}

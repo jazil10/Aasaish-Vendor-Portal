@@ -1,15 +1,29 @@
-.login-page {
-  display: flex;
-  height: 100vh;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.left-panel, .right-panel {
-  flex: 1;
+.login-background {
+  background-color: #f0f2f5;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  padding: 20px;
+}
+
+.login-panel {
+  margin-right: 20px;
+}
+
+.login-page {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
 
 .icon {
@@ -39,6 +53,29 @@
   border: none;
   cursor: pointer;
 }
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-/* Add more styles based on your preference to make it look better */
+/* Additional Styles for Full Width */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+.grid-container {
+  height: 100%;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.paper {
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  margin: 20px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}

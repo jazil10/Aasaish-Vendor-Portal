@@ -1,26 +1,22 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Typography, Box } from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Typography, Box, Divider } from '@mui/material';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasketOutlined';
 import LocalOfferIcon from '@mui/icons-material/LocalOfferOutlined';
 import StorefrontIcon from '@mui/icons-material/StorefrontOutlined';
 import AssignmentIcon from '@mui/icons-material/AssignmentOutlined';
-import EventSeatIcon from '@mui/icons-material/EventSeatOutlined'; // Icon for Reservations
+import EventSeatIcon from '@mui/icons-material/EventSeatOutlined';
 
 function Sidebar() {
-  const navigate = useNavigate(); // Create navigate function
-  const location = useLocation(); // Get the current location
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Function to handle navigation
   const handleNavigation = (path) => {
     navigate(path);
   };
 
-  // Define paths corresponding to the items
   const paths = ['/dashboard', '/stores', '/product', '/inventory', '/orders', '/reservations'];
-
-  // Define icons corresponding to the items
   const icons = [HomeIcon, StorefrontIcon, ShoppingBasketIcon, LocalOfferIcon, AssignmentIcon, EventSeatIcon];
 
   return (
@@ -28,16 +24,16 @@ function Sidebar() {
       variant="permanent"
       anchor="left"
       sx={{
-        width: 240,
+        width: 260,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: 240,
+          width: 260,
           boxSizing: 'border-box',
-          backgroundColor: '#212121', // Dark theme background
-          color: '#ffffff', // Light text for better contrast
-          borderRadius: '0px 25px 25px 0px', // Rounded corners on the right
-          paddingTop: '20px', // Top padding
-          paddingBottom: '20px', // Bottom padding
+          backgroundColor: '#212121',
+          color: '#ffffff',
+          borderRadius: '0px 25px 25px 0px',
+          paddingTop: '20px',
+          paddingBottom: '20px',
         },
       }}
     >
@@ -46,9 +42,10 @@ function Sidebar() {
           Vendor Portal
         </Typography>
       </Box>
+      <Divider sx={{ borderColor: '#424242', marginBottom: '20px' }} />
       <List>
         {['DASHBOARD', 'STORE', 'PRODUCTS', 'INVENTORY', 'ORDERS', 'RESERVATIONS'].map((text, index) => {
-          const Icon = icons[index]; // Get the corresponding icon
+          const Icon = icons[index];
 
           return (
             <ListItem
@@ -56,17 +53,17 @@ function Sidebar() {
               key={text}
               onClick={() => handleNavigation(paths[index])}
               sx={{
-                borderRadius: '20px', // More pronounced rounded list items
+                borderRadius: '20px',
                 marginBottom: '10px',
-                backgroundColor: location.pathname === paths[index] ? '#333' : 'transparent', // Highlight selected item
+                backgroundColor: location.pathname === paths[index] ? '#333' : 'transparent',
                 '&:hover': {
-                  backgroundColor: '#424242', // Darker shade for hover effect
+                  backgroundColor: '#424242',
                   '& .MuiListItemIcon-root': {
-                    color: '#4caf50', // Highlight icon on hover
+                    color: '#4caf50',
                   },
                 },
                 '&.Mui-selected': {
-                  backgroundColor: '#333', // Selection state
+                  backgroundColor: '#333',
                   '&:hover': {
                     backgroundColor: '#424242',
                   },
@@ -76,7 +73,15 @@ function Sidebar() {
               <ListItemIcon sx={{ color: location.pathname === paths[index] ? '#4caf50' : 'gray', minWidth: '40px' }}>
                 <Icon />
               </ListItemIcon>
-              <ListItemText primary={text} sx={{ '& .MuiTypography-root': { fontWeight: 'medium', color: location.pathname === paths[index] ? '#4caf50' : 'white' } }} />
+              <ListItemText
+                primary={text}
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontWeight: 'medium',
+                    color: location.pathname === paths[index] ? '#4caf50' : 'white',
+                  },
+                }}
+              />
             </ListItem>
           );
         })}

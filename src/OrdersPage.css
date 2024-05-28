@@ -1,37 +1,71 @@
-.table-container {
-    width: 100%;
-    margin: 20px 0;
-  }
-  
-  .custom-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .custom-table thead {
-    background-color: #f5f5f5;
-  }
-  
-  .custom-table th, .custom-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-  
-  .custom-table th {
-    font-weight: bold;
-  }
-  
-  .custom-table tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .custom-table .action-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .custom-table .delete-button {
-    color: #d32f2f;
-  }
-  
+/* Heading styling for OrdersPage */
+.orders-heading {
+  font-family: 'Poppins, sans-serif';
+  font-weight: 600;
+  color: #1e90ff;
+  margin-bottom: 20px; /* Add space below the heading */
+}
+
+/* Add space between buttons in the button container */
+.button-container button {
+  margin-left: 8px; /* Adjust the value as needed for the desired spacing */
+}
+
+/* Container for the table */
+.orders-table-container {
+  width: 100%;
+  margin: 20px 0;
+}
+
+/* Custom table styling */
+.orders-custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header styling */
+.orders-custom-table thead {
+  background-color: #f5f5f5;
+}
+
+/* Table cell styling */
+.orders-custom-table th, .orders-custom-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.orders-custom-table th {
+  font-weight: bold;
+}
+
+/* Image styling */
+.orders-custom-table td img {
+  max-width: 150px;
+  max-height: 150px;
+  object-fit: cover;
+}
+
+/* Row hover effect */
+.orders-custom-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Action buttons container */
+.orders-custom-table .action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Delete button styling */
+.orders-custom-table .delete-button {
+  color: #d32f2f;
+}
+
+/* Main content styling */
+.orders-main-content {
+  flex-grow: 1;
+  padding: 5px;
+  margin-left: -60px; /* Adjust margin for better appearance */
+  width: calc(100% - 5px); /* Adjust width calculation */
+}
